@@ -11,6 +11,12 @@ Footer synchronization with upstream occurs at the time of a major release, such
 [Unreleased]
 ************
 
+Fixes
+=====
+* Dynamic use value for config variables transmitted from dynamic MFE_CONFIG. (DR-176)
+    * This fix, should be refactored in the next Open edX release.
+* Static links now aware of runtime config
+
 [redwood-rg.2] 2024-11-13
 *************************
 

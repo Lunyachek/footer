@@ -15,28 +15,56 @@ import React from 'react';
 import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import { AppContext } from '@edx/frontend-platform/react';
 import { getConfig } from '@edx/frontend-platform';
-import { footerLogo, svgSprite, isFooterDark, footerLinks, footerIcons, displayCreatedByBlock } from '@edx/brand'; // eslint-disable-line import/no-unresolved
+import { footerLogo, svgSprite, isFooterDark, footerIcons, displayCreatedByBlock } from '@edx/brand'; // eslint-disable-line import/no-unresolved
 import NavLinks from './NavLinks';
 import SocialLinks from './SocialLinks';
 import messages from './Footer.messages';
 var SiteFooter = /*#__PURE__*/function (_React$PureComponent) {
   _inherits(SiteFooter, _React$PureComponent);
   var _super = _createSuper(SiteFooter);
-  function SiteFooter() {
+  // FIXME: Remove `footerLinks` in the next release, use getFooterLinks instead.
+  //        According export in the brand-openedx component should be removed as well.
+  function SiteFooter(props) {
+    var _this;
     _classCallCheck(this, SiteFooter);
-    return _super.apply(this, arguments);
+    _this = _super.call(this, props);
+    _this.state = {
+      getFooterLinks: null,
+      footerLinks: []
+    };
+    return _this;
   }
   _createClass(SiteFooter, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this2 = this;
+      import('@edx/brand') // eslint-disable-line import/no-unresolved
+      .then(function (brand) {
+        _this2.setState({
+          getFooterLinks: brand.getFooterLinks || null,
+          footerLinks: brand.footerLinks || []
+        });
+      })["catch"](function (error) {
+        // eslint-disable-next-line no-console
+        console.warn('Failed to load @edx/brand:', error);
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
       var intl = this.props.intl;
+      var _this$state = this.state,
+        getFooterLinks = _this$state.getFooterLinks,
+        footerLinks = _this$state.footerLinks;
+      var config = getConfig();
+      var footerLinksList = typeof getFooterLinks === 'function' ? getFooterLinks(config) : footerLinks;
       return /*#__PURE__*/React.createElement("footer", {
         role: "contentinfo",
         className: "footer"
       }, /*#__PURE__*/React.createElement("div", {
         className: "holder"
       }, /*#__PURE__*/React.createElement(NavLinks, {
-        footerLinks: footerLinks
+        footerLinks: footerLinksList
       }), /*#__PURE__*/React.createElement("div", {
         className: "footer-holder"
       }, displayCreatedByBlock && /*#__PURE__*/React.createElement("div", {
@@ -67,7 +95,7 @@ var SiteFooter = /*#__PURE__*/function (_React$PureComponent) {
       }), /*#__PURE__*/React.createElement("div", {
         className: "footer-logo"
       }, /*#__PURE__*/React.createElement("a", {
-        href: "".concat(getConfig().LMS_BASE_URL, "/")
+        href: "".concat(config.LMS_BASE_URL, "/")
       }, /*#__PURE__*/React.createElement("img", {
         src: footerLogo,
         alt: intl.formatMessage(messages['footer.logo.altText'])
